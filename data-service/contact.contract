@@ -1,6 +1,5 @@
 contract DataService {
     event NewDataRequest(uint id, bool initialized, string dataUrl, string jsonPath); 
-    event GetDataRequest(uint id, bool initialized, string dataurl, string jsonPath, bool lastDataPointInitialized, bool lastDataPointSuccess, string lastDataPointResponse);
 
     event AddDataPoint(uint dataRequestId, bool success, string response);
 
@@ -17,7 +16,7 @@ contract DataService {
     }
 
     address private organizer;
-    DataRequest[] private dataRequests;
+    DataRequest[] public dataRequests;
 
     // Create a new lottery with numOfBets supported bets.
     function DataService() {
@@ -35,7 +34,7 @@ contract DataService {
         if(msg.sender != organizer) { throw; }
 
         // Init the data request and save it
-        DataRequest newDataRequest = dataRequests[dataRequests.length++];
+        DataRequest newDataRequest = dataRequests[dataRequests.length];
         newDataRequest.initialized = true;
         newDataRequest.dataUrl = dataUrl;
         newDataRequest.jsonPath = jsonPath;
@@ -44,18 +43,6 @@ contract DataService {
         NewDataRequest(dataRequests.length, newDataRequest.initialized, newDataRequest.dataUrl, newDataRequest.jsonPath);
     }
 
-    // Logs the data request with the requested ID
-    function getDataRequest(uint id) {
-        DataRequest dataRequest = dataRequests[id];
-
-        DataPoint lastDataPoint = dataRequest.dataPoints[dataRequest.dataPoints.length];
-        bool lastDataPointInitialized = lastDataPoint.initialized;
-        bool lastDataPointSuccess = lastDataPoint.success;
-        string lastDataPointResponse = lastDataPoint.response;
-
-        GetDataRequest(id, dataRequest.initialized, dataRequest.dataUrl, dataRequest.jsonPath, lastDataPointInitialized, lastDataPointSuccess, lastDataPointResponse);
-    }
-    
     // Lets the organizer add a new data point
     function addDataPoint(uint dataRequestId, bool success, string response) {
         if(msg.sender != organizer) { throw; }
