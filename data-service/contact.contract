@@ -1,8 +1,9 @@
 contract DataService {
     event NewDataRequest(uint id, bool initialized, string dataUrl, string jsonPath); 
-    event GetDataRequest(uint id, bool initialized, string dataurl, string jsonPath, bool lastDataPointInitialized, bool lastDataPointSuccess, string lastDataPointResponse);
+    event GetDataRequest(uint id, bool initialized, string dataurl, string jsonPath, uint dataPointsLength);
 
     event AddDataPoint(uint dataRequestId, bool success, string response);
+    event GetDataPoint(uint dataRequestId, uint id, bool success, string response);
 
     struct DataPoint {
         bool initialized;
@@ -49,18 +50,15 @@ contract DataService {
     // Logs the data request with the requested ID
     function getDataRequest(uint id) {
         DataRequest dataRequest = dataRequests[id];
+        GetDataRequest(id, dataRequest.initialized, dataRequest.dataUrl, dataRequest.jsonPath, dataRequest.dataPoints.length);
+    }
 
-        bool lastDataPointInitialized = false;
-        bool lastDataPointSuccess;
-        string memory lastDataPointResponse;
-        if(dataRequest.dataPoints.length > 0) { 
-            DataPoint lastDataPoint = dataRequest.dataPoints[dataRequest.dataPoints.length - 1];
-            lastDataPointInitialized = lastDataPoint.initialized;
-            lastDataPointSuccess = lastDataPoint.success;
-            lastDataPointResponse = lastDataPoint.response;
-        }
+    // Gets the data point associated with the provided dataRequest.
+    function getDataPoint(uint dataRequestId, uint dataPointId) {
+        DataRequest dataRequest = dataRequests[dataRequestId];
+        DataPoint dataPoint = dataRequest.dataPoints[dataPointId];
 
-        GetDataRequest(id, dataRequest.initialized, dataRequest.dataUrl, dataRequest.jsonPath, lastDataPointInitialized, lastDataPointSuccess, lastDataPointResponse);
+        GetDataPoint(dataRequestId, dataPointId, dataPoint.success, dataPoint.response);
     }
 
     // Lets the organizer add a new data point
