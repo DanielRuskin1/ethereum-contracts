@@ -29,33 +29,40 @@ contract DataService {
         throw;
     }
     
-    // Make a bet
+    // Lets the organizer add a new data request
     function addDataRequest(string dataUrl, string jsonPath) {
         // Only let organizer add requests for now
         if(msg.sender != organizer) { throw; }
 
+        // Figure out where to store the new DataRequest (next available element)
+        uint nextIndex = dataRequests.length++;
+    
         // Init the data request and save it
-        DataRequest newDataRequest = dataRequests[dataRequests.length++];
+        DataRequest newDataRequest = dataRequests[nextIndex];
         newDataRequest.initialized = true;
         newDataRequest.dataUrl = dataUrl;
         newDataRequest.jsonPath = jsonPath;
-        dataRequests.push(newDataRequest);
 
-        NewDataRequest(dataRequests.length, newDataRequest.initialized, newDataRequest.dataUrl, newDataRequest.jsonPath);
+        NewDataRequest(dataRequests.length - 1, newDataRequest.initialized, newDataRequest.dataUrl, newDataRequest.jsonPath);
     }
 
     // Logs the data request with the requested ID
     function getDataRequest(uint id) {
         DataRequest dataRequest = dataRequests[id];
 
-        DataPoint lastDataPoint = dataRequest.dataPoints[dataRequest.dataPoints.length];
-        bool lastDataPointInitialized = lastDataPoint.initialized;
-        bool lastDataPointSuccess = lastDataPoint.success;
-        string lastDataPointResponse = lastDataPoint.response;
+        bool lastDataPointInitialized = false;
+        bool lastDataPointSuccess;
+        string memory lastDataPointResponse;
+        if(dataRequest.dataPoints.length > 0) { 
+            DataPoint lastDataPoint = dataRequest.dataPoints[dataRequest.dataPoints.length - 1];
+            lastDataPointInitialized = lastDataPoint.initialized;
+            lastDataPointSuccess = lastDataPoint.success;
+            lastDataPointResponse = lastDataPoint.response;
+        }
 
         GetDataRequest(id, dataRequest.initialized, dataRequest.dataUrl, dataRequest.jsonPath, lastDataPointInitialized, lastDataPointSuccess, lastDataPointResponse);
     }
-    
+
     // Lets the organizer add a new data point
     function addDataPoint(uint dataRequestId, bool success, string response) {
         if(msg.sender != organizer) { throw; }
@@ -73,7 +80,7 @@ contract DataService {
 
         AddDataPoint(dataRequestId, success, response);
     }
-    
+
     // Suicide :(
     function destroy() {
         if(msg.sender != organizer) { throw; }
