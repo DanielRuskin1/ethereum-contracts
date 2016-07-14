@@ -1,6 +1,7 @@
 contract DataService {
-    event NewDataRequest(uint id, bool initialized, string dataUrl, string jsonPath); 
-    event GetDataRequest(uint id, bool initialized, string dataurl, string jsonPath, uint dataPointsLength);
+    event NewDataRequest(uint id, bool initialized, string dataUrl); 
+    event GetDataRequestLength(uint length);
+    event GetDataRequest(uint id, bool initialized, string dataurl, uint dataPointsLength);
 
     event AddDataPoint(uint dataRequestId, bool success, string response);
     event GetDataPoint(uint dataRequestId, uint id, bool success, string response);
@@ -13,7 +14,6 @@ contract DataService {
     struct DataRequest {
         bool initialized;
         string dataUrl;
-        string jsonPath;
         DataPoint[] dataPoints;
     }
 
@@ -31,7 +31,7 @@ contract DataService {
     }
     
     // Lets the organizer add a new data request
-    function addDataRequest(string dataUrl, string jsonPath) {
+    function addDataRequest(string dataUrl) {
         // Only let organizer add requests for now
         if(msg.sender != organizer) { throw; }
 
@@ -42,15 +42,19 @@ contract DataService {
         DataRequest newDataRequest = dataRequests[nextIndex];
         newDataRequest.initialized = true;
         newDataRequest.dataUrl = dataUrl;
-        newDataRequest.jsonPath = jsonPath;
 
-        NewDataRequest(dataRequests.length - 1, newDataRequest.initialized, newDataRequest.dataUrl, newDataRequest.jsonPath);
+        NewDataRequest(dataRequests.length - 1, newDataRequest.initialized, newDataRequest.dataUrl);
+    }
+
+    // Returns the amount of dataRequests currently present
+    function getDataRequestLength() {
+        GetDataRequestLength(dataRequests.length);
     }
 
     // Logs the data request with the requested ID
     function getDataRequest(uint id) {
         DataRequest dataRequest = dataRequests[id];
-        GetDataRequest(id, dataRequest.initialized, dataRequest.dataUrl, dataRequest.jsonPath, dataRequest.dataPoints.length);
+        GetDataRequest(id, dataRequest.initialized, dataRequest.dataUrl, dataRequest.dataPoints.length);
     }
 
     // Gets the data point associated with the provided dataRequest.
