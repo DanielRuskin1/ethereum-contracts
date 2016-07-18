@@ -11,7 +11,7 @@ var contractAbi = [ { "constant": false, "inputs": [ { "name": "dataUrl", "type"
 var DataServiceContract = web3.eth.contract(contractAbi);
 
 // Get contract instance
-var contractAddress = "0xa0fD10BE97Cca603450373CDfAEb08316e684360";
+var contractAddress = process.env.DATA_SERVICE_CONTRACT_ADDRESS;
 var contract = DataServiceContract.at(contractAddress);
 
 // General flow of code is:
