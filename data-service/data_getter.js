@@ -1,6 +1,6 @@
 // This script depends on a few things:
 // 1. web3 and request must be installed
-// 2. An ethereum node (with money) must be running in the background, with the following command: "./geth --rpc --unlock 0".
+// 2. An ethereum node (with money) must be running in the background, with the following command: "geth --rpc --unlock 0".
 // 3. The address of the contract must be set to DATA_SERVICE_CONTRACT_ADDRESS
 var Web3 = require("web3");
 var Request = require('request');
