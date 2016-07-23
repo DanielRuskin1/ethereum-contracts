@@ -32,9 +32,6 @@ contract DataService {
     
     // Lets the organizer add a new data request
     function addDataRequest(string dataUrl) {
-        // Only let organizer add requests for now
-        if(msg.sender != organizer) { throw; }
-
         // Figure out where to store the new DataRequest (next available element)
         uint nextIndex = dataRequests.length++;
     
