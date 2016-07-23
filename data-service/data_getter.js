@@ -96,10 +96,10 @@ var processDataRequests = function() {
   }
 }
 
-// Kickoff the data request retrievals, + call it once immediately
-setInterval(retrieveDataRequestLength, 60 * 5000);
+// Get data requests every 10 minutes, + call it once immediately
+setInterval(retrieveDataRequestLength, 60 * 10000);
 retrieveDataRequestLength();
 
-// Process all data requests every minute
+// Process all data requests every 5 minutes
 setInterval(processDataRequests, 60 * 5000);
 
