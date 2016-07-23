@@ -40,7 +40,7 @@ getLengthEvents.watch(function(error, getLengthResult){
   if(error) {
     console.log(error);
   } else {
-    var lengthActual = getLengthResult.args.length.s;
+    var lengthActual = getLengthResult.args.length.c[0];
     console.log("Retrieved data request length", lengthActual);
 
     // Iterate through each data request and persist it
@@ -58,16 +58,16 @@ var requestDataRequestMetadata = function(dataRequestId) {
 
 // Event handler for receiving data request metadata.
 // Persists it to the data requests array.
-var getDataRequestEvents = contract.GetDataRequest();
-getDataRequestEvents.watch(function(error, getRequestDataResult) {
+var getDataRequestMetadataEvents = contract.GetDataRequest();
+getDataRequestMetadataEvents.watch(function(error, getDataRequestMetadataResult) {
   console.log("Got data request metadata event");
 
   if (error) {
     console.log(error);
   } else {
     // We got the metadata (including the URL)
-    var dataRequestId = getRequestDataResult.args.id.e;
-    var dataRequestUrl = getRequestDataResult.args.dataurl;
+    var dataRequestId = getDataRequestMetadataResult.args.id.c[0];
+    var dataRequestUrl = getDataRequestMetadataResult.args.dataurl;
     console.log("Retrieved metadata for data request", dataRequestId, dataRequestUrl);
 
     // Persist it!
@@ -80,17 +80,20 @@ var processDataRequests = function() {
   console.log("Processing data requests");
 
   for (var dataRequestId in dataRequests) {
-    var dataRequestUrl = dataRequests[dataRequestId];
-    console.log("Making HTTP request for data request", dataRequestId, dataRequestUrl);
+    // Object names are converted to strings by default; convert back to int.
+    var dataRequestIdInt = parseInt(dataRequestId);
+
+    var dataRequestUrl = dataRequests[dataRequestIdInt];
+    console.log("Making HTTP request for data request", dataRequestIdInt, dataRequestUrl);
 
     Request(dataRequestUrl, function (error, response, body) {
-      console.log("HTTP response received", dataRequestId, error, body);
-      console.log("Persisting data point to contract", dataRequestId);
+      console.log("HTTP response received", dataRequestIdInt, error, body);
+      console.log("Persisting data point to contract", dataRequestIdInt);
 
       if (error) {
-        contract.addDataPoint(dataRequestId, false, "");
+        contract.addDataPoint(dataRequestIdInt, false, "");
       } else {
-        contract.addDataPoint(dataRequestId, true, body);
+        contract.addDataPoint(dataRequestIdInt, true, body, { gas: 1000000 }); // 1mil gas is an arbitrary amount we're willing to pay
       }
     });
   }
