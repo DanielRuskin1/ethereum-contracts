@@ -97,9 +97,9 @@ var processDataRequests = function() {
 }
 
 // Kickoff the data request retrievals, + call it once immediately
-setInterval(retrieveDataRequestLength, 60 * 1000);
+setInterval(retrieveDataRequestLength, 60 * 5000);
 retrieveDataRequestLength();
 
 // Process all data requests every minute
-setInterval(processDataRequests, 60 * 1000);
+setInterval(processDataRequests, 60 * 5000);
 
